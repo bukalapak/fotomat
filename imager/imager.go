@@ -99,12 +99,6 @@ func (img *Imager) Thumbnail(width, height uint, within bool) ([]byte, error) {
 }
 
 func (img *Imager) Crop(width, height uint) ([]byte, error) {
-	// If requested width or height are larger than original, scale
-	// request down to fit within original dimensions.
-	if width > img.Width || height > img.Height {
-		width, height = scaleAspect(width, height, img.Width, img.Height, true)
-	}
-
 	// Figure out the intermediate size the original image would have to
 	// be scaled to be cropped to requested size.
 	iw, ih := scaleAspect(img.Width, img.Height, width, height, false)

@@ -31,7 +31,7 @@ func (img *Imager) NewResult(width, height uint) (*Result, error) {
 	// If we're scaling down, ask the jpeg decoder to pre-scale for us,
 	// down to something at least as big as this.  This is often a huge
 	// performance gain.
-	if width > 0 && height > 0 && img.Width > width && img.Height > height {
+	if width > 0 && height > 0 {
 		s := fmt.Sprintf("%dx%d", width, height)
 		if err := result.wand.SetOption("jpeg:size", s); err != nil {
 			result.Close()
@@ -125,14 +125,11 @@ func (result *Result) Resize(width, height uint) error {
 }
 
 func (result *Result) Crop(width, height uint) error {
-	if width > result.Width || height > result.Height {
-		return TooBig
-	}
 
 	// Center horizontally
 	x := (int(result.Width) - int(width) + 1) / 2
-	// Assume faces are higher up vertically
-	y := (int(result.Height) - int(height) + 1) / 4
+	// Also center vertically
+	y := (int(result.Height) - int(height) + 1) / 2
 
 	ow, oh, ox, oy := result.Orientation.Crop(width, height, x, y, result.Width, result.Height)
 	if err := result.wand.CropImage(ow, oh, ox, oy); err != nil {
