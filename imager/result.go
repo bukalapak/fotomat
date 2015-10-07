@@ -181,20 +181,20 @@ func (result *Result) Get() ([]byte, error) {
 		}
 	}
 
-	if result.img.OutputFormat == "PNG" {
-		blob, err := result.compress("PNG", 95, imagick.INTERLACE_NO)
-		if err != nil || hasAlpha || (len(blob)-256)*8 <= int(result.Width*result.Height*result.img.PngMaxBitsPerPixel) {
-			return blob, err
-		}
-	}
+	quality := uint(95)
+	interlace := imagick.INTERLACE_LINE // Progressive
 
 	// Interlace saves 2-3%, but incurs a few hundred bytes of overhead.
 	// This isn't usually beneficial on small images.
 	if result.Width*result.Height < 200*200 {
-		return result.compress("JPEG", result.img.JpegQuality, imagick.INTERLACE_NO)
+		interlace = imagick.INTERLACE_NO
 	}
 
-	return result.compress("JPEG", result.img.JpegQuality, imagick.INTERLACE_LINE)
+	if result.img.OutputFormat == "JPEG" {
+		quality = result.img.JpegQuality
+	}
+
+	return result.compress(result.img.OutputFormat, quality, interlace)
 }
 
 func (result *Result) compress(format string, quality uint, interlace imagick.InterlaceType) ([]byte, error) {
