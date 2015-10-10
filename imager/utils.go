@@ -17,6 +17,8 @@ func detectFormats(blob []byte) (string, string) {
 		return "PNG", "PNG"
 	case "image/gif":
 		return "GIF", "GIF"
+	case "image/bmp":
+		return "BMP", "JPEG"
 	default:
 		return "", ""
 	}

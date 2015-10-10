@@ -28,9 +28,8 @@ func (img *Imager) NewResult(width, height uint) (*Result, error) {
 	// Swap width and height if orientation will be corrected later.
 	width, height = result.Orientation.Dimensions(width, height)
 
-	// If we're scaling down, ask the jpeg decoder to pre-scale for us,
-	// down to something at least as big as this.  This is often a huge
-	// performance gain.
+	// Ask the jpeg decoder to pre-scale for us, to something at least as big as this.  
+	// This is often a huge performance gain.
 	if width > 0 && height > 0 {
 		s := fmt.Sprintf("%dx%d", width, height)
 		if err := result.wand.SetOption("jpeg:size", s); err != nil {
@@ -182,23 +181,15 @@ func (result *Result) Get() ([]byte, error) {
 	}
 
 	quality := uint(95)
-	interlace := imagick.INTERLACE_LINE // Progressive
-
-	// Interlace saves 2-3%, but incurs a few hundred bytes of overhead.
-	// This isn't usually beneficial on small images.
-	if result.Width*result.Height < 200*200 {
-		interlace = imagick.INTERLACE_NO
-	}
 
 	if result.img.OutputFormat == "JPEG" {
 		quality = result.img.JpegQuality
 	}
 
-	return result.compress(result.img.OutputFormat, quality, interlace)
+	return result.compress(result.img.OutputFormat, quality, imagick.INTERLACE_LINE) // Progressive
 }
 
 func (result *Result) compress(format string, quality uint, interlace imagick.InterlaceType) ([]byte, error) {
-	// Output image format may differ from input format.
 	if err := result.wand.SetImageFormat(format); err != nil {
 		return nil, err
 	}

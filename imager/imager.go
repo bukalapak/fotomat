@@ -34,7 +34,7 @@ type Imager struct {
 
 func New(blob []byte, maxBufferPixels uint) (*Imager, error) {
 	// Security: Guess at formats.  Limit formats we pass to ImageMagick
-	// to just JPEG, PNG, GIF.
+	// to just JPEG, PNG, GIF, BMP.
 	inputFormat, outputFormat := detectFormats(blob)
 	if inputFormat == "" {
 		return nil, UnknownFormat
@@ -89,10 +89,8 @@ func (img *Imager) Thumbnail(width, height uint, within bool) ([]byte, error) {
 	}
 	defer result.Close()
 
-	if result.Width > width || result.Height > height {
-		if err := result.Resize(width, height); err != nil {
-			return nil, err
-		}
+	if err := result.Resize(width, height); err != nil {
+		return nil, err
 	}
 
 	return result.Get()
@@ -109,11 +107,9 @@ func (img *Imager) Crop(width, height uint) ([]byte, error) {
 	}
 	defer result.Close()
 
-	// If necessary, scale down to appropriate intermediate size.
-	if result.Width > iw || result.Height > ih {
-		if err := result.Resize(iw, ih); err != nil {
-			return nil, err
-		}
+	// Scale to appropriate intermediate size.
+	if err := result.Resize(iw, ih); err != nil {
+		return nil, err
 	}
 
 	// If necessary, crop to fit exact size.
