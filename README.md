@@ -21,7 +21,7 @@ and commented out a couple of dependencies that aren't available on RHEL 6.
 
 On Debian or Ubuntu, this should just be:
 
-	apt-get update && apt-get install imagemagick imagemagick-devel
+	apt-get update && apt-get install imagemagick libmagickwand-dev
 
 Then for all OSes:
 
